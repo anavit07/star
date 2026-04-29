@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -188,10 +189,6 @@ label{font-size:12px;font-weight:600;color:var(--textSec);margin-bottom:5px;disp
 .sum-val{font-size:20px;font-weight:700;font-family:var(--mono);line-height:1;letter-spacing:-.5px}
 .sum-lbl{font-size:8.5px;color:var(--textMut);text-transform:uppercase;letter-spacing:1.5px;margin-top:4px;font-family:var(--mono)}
 
-
-
-
-
 #copy-btn.copied{background:var(--greenV)!important}
 .cp-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:0;margin-bottom:10px;min-height:0}
 .cp-chip{display:inline-flex;align-items:center;gap:5px;padding:5px 10px 5px 12px;border-radius:20px;background:var(--primaryDim);border:1.5px solid rgba(25,118,210,.25);cursor:pointer;transition:all .15s;user-select:none;-webkit-tap-highlight-color:transparent}
@@ -217,29 +214,31 @@ label{font-size:12px;font-weight:600;color:var(--textSec);margin-bottom:5px;disp
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
 @media(min-width:768px){
-  #header{padding:18px 28px 0}
-  #oee-bar{gap:28px;padding:12px 0 18px}
-  .oee-val{font-size:42px;letter-spacing:-1px}
-  .oee-div{height:48px}
-  .oee-bar-track{width:80px;height:6px}
-  .oee-pct{font-size:15px;font-weight:700}
-  #content{max-width:980px;margin:0 auto;padding:20px 24px 100px}
-  .metrics-grid{grid-template-columns:repeat(4,1fr)}
-  .fin-grid{grid-template-columns:repeat(4,1fr)}
-  .launch-grid{grid-template-columns:repeat(4,1fr)}
-  .launch-col .btn{margin-bottom:0}
-  .summary-grid{gap:12px}
+#header{padding:18px 28px 0}
+#oee-bar{gap:28px;padding:12px 0 18px}
+.oee-val{font-size:42px;letter-spacing:-1px}
+.oee-div{height:48px}
+.oee-bar-track{width:80px;height:6px}
+.oee-pct{font-size:15px;font-weight:700}
+#content{max-width:980px;margin:0 auto;padding:20px 24px 100px}
+.metrics-grid{grid-template-columns:repeat(4,1fr)}
+.fin-grid{grid-template-columns:repeat(4,1fr)}
+.launch-grid{grid-template-columns:repeat(4,1fr)}
+.launch-col .btn{margin-bottom:0}
+.summary-grid{gap:12px}
 }
 @media print{
-  body *{display:none!important}
-  #print-area,#print-area *{display:block!important}
-  #print-area{display:block!important;position:fixed;inset:0;background:#fff;padding:24px;font-family:'Courier New',monospace;font-size:11pt;color:#000;white-space:pre-wrap;line-height:1.7}
+body *{display:none!important}
+#print-area,#print-area *{display:block!important}
+#print-area{display:block!important;position:fixed;inset:0;background:#fff;padding:24px;font-family:'Courier New',monospace;font-size:11pt;color:#000;white-space:pre-wrap;line-height:1.7}
 }
 </style>
+
 </head>
 <body>
 
 <!-- ── LOGIN OVERLAY ─────────────────────────────────────── -->
+
 <div id="loginOverlay" style="display:flex;position:fixed;inset:0;z-index:9999;background:#0D1B2E;align-items:center;justify-content:center;padding:20px">
   <div style="background:#fff;border-radius:18px;padding:32px 24px;width:100%;max-width:360px;box-shadow:0 20px 60px rgba(0,0,0,.4)">
     <div style="text-align:center;margin-bottom:24px">
@@ -524,10 +523,8 @@ label{font-size:12px;font-weight:600;color:var(--textSec);margin-bottom:5px;disp
   </div>
 </div>
 
+<!-- ── ABA RELATÓRIO — CORRIGIDA ──────────────────────────── -->
 <div id="page-relatorio" class="page">
-    </div>
-</div>
-  </div>
   <div class="card"><div class="card-title">Data do Turno</div><input type="date" id="dataTurno" oninput="save();document.getElementById('relatorioPrevia').textContent=gerarRelatorio()"></div>
   <div class="card"><div class="card-title">Obs. para o Próximo Turno</div><textarea id="obsProx" placeholder="Passe informações importantes para o próximo turno..."></textarea></div>
   <div style="display:flex;gap:10px;margin-bottom:8px">
@@ -543,6 +540,7 @@ label{font-size:12px;font-weight:600;color:var(--textSec);margin-bottom:5px;disp
   </div>
   <div class="card"><div class="card-title">Prévia do Relatório</div><pre class="relatorio-pre" id="relatorioPrevia"></pre></div>
 </div>
+<!-- ─────────────────────────────────────────────────────── -->
 
 </div>
 <div id="print-area" style="display:none"></div>
@@ -694,9 +692,6 @@ async function sbLoad() {
     }
   } catch(e) { console.warn('sbLoad erro', e); }
 }
-// ────────────────────────────────────────────────────────────
-
-
 
 var TURNO   = 528;
 var MOTIVOS = ['TT','CO','ST','TF'];
@@ -721,8 +716,6 @@ var S = {
 
 function isTypingIn(container){ var ae=document.activeElement; return ae&&container&&container.contains(ae)&&(ae.tagName==='INPUT'||ae.tagName==='TEXTAREA'); }
 function tempoUtil(){ return Math.round(TURNO*(1-(CFG.pctDesconto||3)/100)); }
-
-// ── CORRIGIDO: pad2 adicionada aqui ─────────────────────────
 function pad2(s){ s=String(s); while(s.length<5) s+=' '; return s; }
 
 function calcMeta(){
@@ -809,42 +802,21 @@ function gerarChipsCodigos(blocoIdx){
   return h;
 }
 function usarCodigo(blocoIdx,cod){ S.blocos[blocoIdx].codicePezzo=cod; var inp=document.getElementById('codicePezzo_'+blocoIdx); if(inp)inp.value=cod; save(); }
-function salvarCodigoHistorico(val){ val=(val||'').trim(); if(!val)return; if(!CFG.pecasSalvas)CFG.pecasSalvas=[]; CFG.pecasSalvas=CFG.pecasSalvas.filter(function(c){return c!==val;}); CFG.pecasSalvas.unshift(val); if(CFG.pecasSalvas.length>20)CFG.pecasSalvas=CFG.pecasSalvas.slice(0,20); save(); atualizarDatalist();
-
-// Verifica sessão salva — se válida entra direto, senão mostra login
-document.getElementById('header').style.display='none';
-document.getElementById('content').style.display='none';
-sbVerificarToken().then(function(ok){
-  if(ok){
-    mostrarPainel();
-    sbLoad().then(function(){
-      render();
-      var fields={anProblema:'problema',anCausaRaiz:'causaRaiz',anOQueFoi:'oQueFoi',anProposta:'proposta',anResponsavel:'responsavel',anAcaoPendente:'acaoPendente'};
-      Object.keys(fields).forEach(function(id){var el=document.getElementById(id);if(el&&S.analise[fields[id]])el.value=S.analise[fields[id]];});
-    }).catch(function(){render();});
-  } else {
-    mostrarLogin();
-    render();
-  }
-}).catch(function(){ mostrarLogin(); render(); }); for(var i=0;i<S.blocos.length;i++){var el=document.getElementById('chips_codigos_'+i);if(el)el.innerHTML=gerarChipsCodigos(i);} }
-function removerCodigo(idx){ if(!CFG.pecasSalvas)return; CFG.pecasSalvas.splice(idx,1); save(); atualizarDatalist();
-
-// Verifica sessão salva — se válida entra direto, senão mostra login
-document.getElementById('header').style.display='none';
-document.getElementById('content').style.display='none';
-sbVerificarToken().then(function(ok){
-  if(ok){
-    mostrarPainel();
-    sbLoad().then(function(){
-      render();
-      var fields={anProblema:'problema',anCausaRaiz:'causaRaiz',anOQueFoi:'oQueFoi',anProposta:'proposta',anResponsavel:'responsavel',anAcaoPendente:'acaoPendente'};
-      Object.keys(fields).forEach(function(id){var el=document.getElementById(id);if(el&&S.analise[fields[id]])el.value=S.analise[fields[id]];});
-    }).catch(function(){render();});
-  } else {
-    mostrarLogin();
-    render();
-  }
-}).catch(function(){ mostrarLogin(); render(); }); for(var i=0;i<S.blocos.length;i++){var el=document.getElementById('chips_codigos_'+i);if(el)el.innerHTML=gerarChipsCodigos(i);} }
+function salvarCodigoHistorico(val){
+  val=(val||'').trim(); if(!val)return;
+  if(!CFG.pecasSalvas)CFG.pecasSalvas=[];
+  CFG.pecasSalvas=CFG.pecasSalvas.filter(function(c){return c!==val;});
+  CFG.pecasSalvas.unshift(val);
+  if(CFG.pecasSalvas.length>20)CFG.pecasSalvas=CFG.pecasSalvas.slice(0,20);
+  save(); atualizarDatalist();
+  for(var i=0;i<S.blocos.length;i++){var el=document.getElementById('chips_codigos_'+i);if(el)el.innerHTML=gerarChipsCodigos(i);}
+}
+function removerCodigo(idx){
+  if(!CFG.pecasSalvas)return;
+  CFG.pecasSalvas.splice(idx,1);
+  save(); atualizarDatalist();
+  for(var i=0;i<S.blocos.length;i++){var el=document.getElementById('chips_codigos_'+i);if(el)el.innerHTML=gerarChipsCodigos(i);}
+}
 function salvarCFG(){ var op=document.getElementById('nomeOperador');var sv=document.getElementById('nomeSupervisor');var nt=document.getElementById('numTurno');var pd=document.getElementById('pctDesconto'); if(op)CFG.operador=op.value;if(sv)CFG.supervisor=sv.value;if(nt)CFG.numTurno=nt.value;if(pd)CFG.pctDesconto=parseFloat(pd.value)||3; var ho=document.getElementById('hOperador');var hs=document.getElementById('hSupervisor'); if(ho)ho.textContent=CFG.operador||'Ana';if(hs)hs.textContent=CFG.supervisor||'—'; save(); }
 
 function oc(v){return v>=0.85?'#4ADE80':v>=0.65?'#FDE68A':'#F87171';}
@@ -1112,7 +1084,6 @@ function salvarSnapshotHistorico(){
   try{localStorage.setItem('historico_rb0515',JSON.stringify(hist));}catch(e){}
 }
 
-// ── RELATÓRIO SEMANAL (usa pad2 — agora definida acima) ──────
 function gerarRelatorioSemanal(){
   var hist=[];try{hist=JSON.parse(localStorage.getItem('historico_rb0515')||'[]');}catch(e){}
   var limite=new Date();limite.setDate(limite.getDate()-6);limite.setHours(0,0,0,0);
@@ -1153,23 +1124,13 @@ function gerarRelatorioSemanal(){
   return t;
 }
 
-
-
 function imprimirRelatorio(){var pa=document.getElementById('print-area');if(pa)pa.textContent=gerarRelatorio();window.print();}
 function copiarRelatorio(){
   var txt=gerarRelatorio();var btn=document.getElementById('copy-btn');
-  var flash=function(){btn.textContent='✓ Copiado!';btn.classList.add('copied');setTimeout(function(){btn.textContent='📋 Copiar Relatório';btn.classList.remove('copied');},2500);};
+  var flash=function(){btn.textContent='✓ Copiado!';btn.style.background='var(--greenV)';setTimeout(function(){btn.textContent='📋 Copiar Relatório';btn.style.background='';},2500);};
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(flash).catch(function(){var ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);flash();});}
   else{var ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);flash();}
 }
-
-
-var _dadosMensais=null;
-
-function oeeCor(v){return v>=85?'var(--greenV)':v>=65?'var(--yellowV)':'var(--redV)';}
-function oeeBg(v){return v>=85?'var(--greenBg)':v>=65?'var(--yellowBg)':'var(--redBg)';}
-
-
 
 function confirmarNovoTurno(){document.getElementById('modalNovoTurno').classList.add('show');}
 function fecharModal(){document.getElementById('modalNovoTurno').classList.remove('show');}
@@ -1223,7 +1184,8 @@ sbVerificarToken().then(function(ok){
     mostrarLogin();
     render();
   }
-}).catch(function(){ mostrarLogin(); render(); });render();
+}).catch(function(){ mostrarLogin(); render(); });
 </script>
+
 </body>
 </html>
