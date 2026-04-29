@@ -525,9 +525,6 @@ label{font-size:12px;font-weight:600;color:var(--textSec);margin-bottom:5px;disp
 </div>
 
 <div id="page-relatorio" class="page">
-  <div class="gas-config-card">
-    <div class="gas-header">
-      <div class="card-title" style="margin:0">📊 Integração — Google Sheets</div>
       <button class="gas-toggle" id="gasToggleBtn" onclick="toggleGasConfig()">▼ configurar</button>
     </div>
     <div class="gas-body" id="gasBody">
@@ -537,12 +534,10 @@ label{font-size:12px;font-weight:600;color:var(--textSec);margin-bottom:5px;disp
   </div>
   <div class="card"><div class="card-title">Data do Turno</div><input type="date" id="dataTurno" oninput="save();document.getElementById('relatorioPrevia').textContent=gerarRelatorio()"></div>
   <div class="card"><div class="card-title">Obs. para o Próximo Turno</div><textarea id="obsProx" placeholder="Passe informações importantes para o próximo turno..."></textarea></div>
-  <button class="btn btn-success btn-lg" id="sheet-btn" onclick="enviarPlanilha()" style="margin-bottom:8px">📊 Enviar para Planilha</button>
   <div style="display:flex;gap:10px;margin-bottom:8px">
     <button class="btn btn-primary btn-lg" id="copy-btn" onclick="copiarRelatorio()" style="flex:1">📋 Copiar Relatório</button>
     <button class="btn btn-ghost btn-lg" id="print-btn" onclick="imprimirRelatorio()" style="flex:1;border-color:var(--primary);color:var(--primary)">🖨️ Imprimir Diário</button>
   </div>
-  <button class="btn btn-ghost btn-lg" onclick="imprimirSemanal()" style="margin-bottom:8px;border-color:var(--yellow);color:var(--yellow)">📅 Imprimir Relatório Semanal</button>
   <button class="btn btn-ghost btn-lg" id="novo-turno-btn" onclick="confirmarNovoTurno()" style="border-color:var(--redV);color:var(--red);margin-bottom:14px">🔄 Novo Turno</button>
   <div class="summary-grid">
     <div class="sum-box"><div class="sum-val" id="sBoas" style="color:var(--green)">0</div><div class="sum-lbl">Boas</div></div>
@@ -572,8 +567,8 @@ label{font-size:12px;font-weight:600;color:var(--textSec);margin-bottom:5px;disp
 'use strict';
 
 // ── SUPABASE CONFIG ─────────────────────────────────────────
-var SB_URL   = 'https://znzumtyqvoqzasjlhwug.supabase.co'; // ← troque
-var SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuenVtdHlxdm9xemFzamxod3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMzQwMjUsImV4cCI6MjA5MjkxMDAyNX0.eYym9d-xOVAa25O78DLEppasdnfGwgWqFZKuoTgf5zA';  // ← sua anon key
+var SB_URL   = 'https://znzumtyqvoqzasjlhwug.supabase.co';
+var SB_KEY   = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpuenVtdHlxdm9xemFzamxod3VnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzczMzQwMjUsImV4cCI6MjA5MjkxMDAyNX0.eYym9d-xOVAa25O78DLEppasdnfGwgWqFZKuoTgf5zA';
 var SB_TABLE = 'turnos_star';
 var SB_TOKEN = null;
 var SB_ID    = null;
@@ -705,6 +700,8 @@ async function sbLoad() {
 }
 // ────────────────────────────────────────────────────────────
 
+
+
 var TURNO   = 528;
 var MOTIVOS = ['TT','CO','ST','TF'];
 
@@ -816,8 +813,42 @@ function gerarChipsCodigos(blocoIdx){
   return h;
 }
 function usarCodigo(blocoIdx,cod){ S.blocos[blocoIdx].codicePezzo=cod; var inp=document.getElementById('codicePezzo_'+blocoIdx); if(inp)inp.value=cod; save(); }
-function salvarCodigoHistorico(val){ val=(val||'').trim(); if(!val)return; if(!CFG.pecasSalvas)CFG.pecasSalvas=[]; CFG.pecasSalvas=CFG.pecasSalvas.filter(function(c){return c!==val;}); CFG.pecasSalvas.unshift(val); if(CFG.pecasSalvas.length>20)CFG.pecasSalvas=CFG.pecasSalvas.slice(0,20); save(); atualizarDatalist(); for(var i=0;i<S.blocos.length;i++){var el=document.getElementById('chips_codigos_'+i);if(el)el.innerHTML=gerarChipsCodigos(i);} }
-function removerCodigo(idx){ if(!CFG.pecasSalvas)return; CFG.pecasSalvas.splice(idx,1); save(); atualizarDatalist(); for(var i=0;i<S.blocos.length;i++){var el=document.getElementById('chips_codigos_'+i);if(el)el.innerHTML=gerarChipsCodigos(i);} }
+function salvarCodigoHistorico(val){ val=(val||'').trim(); if(!val)return; if(!CFG.pecasSalvas)CFG.pecasSalvas=[]; CFG.pecasSalvas=CFG.pecasSalvas.filter(function(c){return c!==val;}); CFG.pecasSalvas.unshift(val); if(CFG.pecasSalvas.length>20)CFG.pecasSalvas=CFG.pecasSalvas.slice(0,20); save(); atualizarDatalist();
+
+// Verifica sessão salva — se válida entra direto, senão mostra login
+document.getElementById('header').style.display='none';
+document.getElementById('content').style.display='none';
+sbVerificarToken().then(function(ok){
+  if(ok){
+    mostrarPainel();
+    sbLoad().then(function(){
+      render();
+      var fields={anProblema:'problema',anCausaRaiz:'causaRaiz',anOQueFoi:'oQueFoi',anProposta:'proposta',anResponsavel:'responsavel',anAcaoPendente:'acaoPendente'};
+      Object.keys(fields).forEach(function(id){var el=document.getElementById(id);if(el&&S.analise[fields[id]])el.value=S.analise[fields[id]];});
+    }).catch(function(){render();});
+  } else {
+    mostrarLogin();
+    render();
+  }
+}).catch(function(){ mostrarLogin(); render(); }); for(var i=0;i<S.blocos.length;i++){var el=document.getElementById('chips_codigos_'+i);if(el)el.innerHTML=gerarChipsCodigos(i);} }
+function removerCodigo(idx){ if(!CFG.pecasSalvas)return; CFG.pecasSalvas.splice(idx,1); save(); atualizarDatalist();
+
+// Verifica sessão salva — se válida entra direto, senão mostra login
+document.getElementById('header').style.display='none';
+document.getElementById('content').style.display='none';
+sbVerificarToken().then(function(ok){
+  if(ok){
+    mostrarPainel();
+    sbLoad().then(function(){
+      render();
+      var fields={anProblema:'problema',anCausaRaiz:'causaRaiz',anOQueFoi:'oQueFoi',anProposta:'proposta',anResponsavel:'responsavel',anAcaoPendente:'acaoPendente'};
+      Object.keys(fields).forEach(function(id){var el=document.getElementById(id);if(el&&S.analise[fields[id]])el.value=S.analise[fields[id]];});
+    }).catch(function(){render();});
+  } else {
+    mostrarLogin();
+    render();
+  }
+}).catch(function(){ mostrarLogin(); render(); }); for(var i=0;i<S.blocos.length;i++){var el=document.getElementById('chips_codigos_'+i);if(el)el.innerHTML=gerarChipsCodigos(i);} }
 function salvarCFG(){ var op=document.getElementById('nomeOperador');var sv=document.getElementById('nomeSupervisor');var nt=document.getElementById('numTurno');var pd=document.getElementById('pctDesconto'); if(op)CFG.operador=op.value;if(sv)CFG.supervisor=sv.value;if(nt)CFG.numTurno=nt.value;if(pd)CFG.pctDesconto=parseFloat(pd.value)||3; var ho=document.getElementById('hOperador');var hs=document.getElementById('hSupervisor'); if(ho)ho.textContent=CFG.operador||'Ana';if(hs)hs.textContent=CFG.supervisor||'—'; save(); }
 
 function oc(v){return v>=0.85?'#4ADE80':v>=0.65?'#FDE68A':'#F87171';}
@@ -1126,69 +1157,7 @@ function gerarRelatorioSemanal(){
   return t;
 }
 
-function montarTextoSemanal(turnos,paradas){
-  if(!turnos.length)return'— Nenhum turno encontrado nos últimos 7 dias na planilha.';
-  var now=new Date();
-  var t='╔══════════════════════════════════════════╗\n║   RELATÓRIO SEMANAL — TORNO STAR RB0515  ║\n╚══════════════════════════════════════════╝\n';
-  t+='Operador: '+(turnos[0].operador||CFG.operador||'Ana')+' | Líder: '+(turnos[0].supervisor||CFG.supervisor||'—')+'\n';
-  var datas=turnos.map(function(h){return h.dataISO;}).sort();
-  t+='Período: '+turnos[0].data+' → '+turnos[turnos.length-1].data+'\nGerado em: '+now.toLocaleDateString('pt-BR')+'\n'+'─'.repeat(44)+'\n\n';
-  var totBoas=0,totRefugo=0,totMeta=0,totPar=0,somaOEE=0,somaDisp=0,somaPerf=0,somaQual=0;
-  turnos.forEach(function(h){totBoas+=h.boas||0;totRefugo+=h.refugo||0;totMeta+=h.meta||0;totPar+=h.par||0;somaOEE+=h.oee||0;somaDisp+=h.disp||0;somaPerf+=h.perf||0;somaQual+=h.qual||0;});
-  var n=turnos.length;
-  var oeeM=(somaOEE/n).toFixed(1),dispM=(somaDisp/n).toFixed(1),perfM=(somaPerf/n).toFixed(1),qualM=(somaQual/n).toFixed(1);
-  var hrsPar=(totPar/60).toFixed(1);var pctMeta=totMeta>0?Math.round(((totBoas+totRefugo)/totMeta)*100):0;
-  t+='📊 OEE MÉDIO SEMANAL\n';
-  t+='┌──────────┬──────────┬──────────┬──────────┐\n';
-  t+='│   OEE    │   DISP   │   PERF   │   QUAL   │\n';
-  t+='│  '+pad2(oeeM+'%')+'   │  '+pad2(dispM+'%')+'   │  '+pad2(perfM+'%')+'   │  '+pad2(qualM+'%')+'   │\n';
-  t+='└──────────┴──────────┴──────────┴──────────┘\n\n';
-  t+='🔩 PRODUÇÃO DA SEMANA\n• Turnos: '+n+'\n• Peças boas: '+totBoas+'\n• Refugo: '+totRefugo+'\n• Meta acumulada: '+totMeta+' pç ('+pctMeta+'% atingido)\n• Horas paradas: '+hrsPar+'h ('+totPar+' min)\n\n';
-  var freq={};paradas.forEach(function(p){var c=p.tipo||'Outro';freq[c]=(freq[c]||0)+(p.duracao||0);});
-  var chaves=Object.keys(freq).sort(function(a,b){return freq[b]-freq[a];});
-  if(chaves.length){t+='⛔ PRINCIPAIS PERDAS (min)\n';chaves.slice(0,5).forEach(function(k){t+='• '+k+': '+freq[k]+' min\n';});t+='\n';}
-  t+='📋 DETALHE POR TURNO\n';
-  turnos.forEach(function(h,i){var ic=h.oee>=85?'✅':h.oee>=65?'⚠':'✗';t+=(i+1)+'. '+h.data+' T'+h.turno+' — OEE: '+h.oee+'% '+ic+' | Boas: '+h.boas+" | Paradas: "+h.par+"'\n";if(h.obsProx)t+='   ↳ '+h.obsProx.substring(0,70)+'\n';});
-  t+='\n';var oeeNum=parseFloat(oeeM);
-  t+='─'.repeat(44)+'\n';
-  t+=oeeNum>=85?'✅ OEE acima da meta (85%). Bom trabalho!\n':oeeNum>=65?'⚠ OEE abaixo da meta. Foco na principal perda.\n':'✗ OEE crítico. Análise urgente necessária.\n';
-  return t;
-}
 
-function imprimirSemanal(){
-  var url='';try{url=localStorage.getItem('gas_url_rb0515')||'';}catch(e){}
-  if(!url||url.indexOf('script.google.com')===-1){
-    // fallback local
-    var txt=gerarRelatorioSemanal();
-    var pa=document.getElementById('print-area');if(pa){pa.style.fontFamily="'Courier New',monospace";pa.textContent=txt;}
-    window.print();return;
-  }
-  var btn=document.querySelector('[onclick="imprimirSemanal()"]');
-  if(btn){btn.textContent='⏳ Buscando dados...';btn.disabled=true;}
-  var xhr=new XMLHttpRequest();xhr.open('GET',url+'?acao=semanal',true);
-  xhr.onload=function(){
-    if(btn){btn.textContent='📅 Imprimir Relatório Semanal';btn.disabled=false;}
-    try{
-      var res=JSON.parse(xhr.responseText);
-      if(!res.ok){alert('Erro na planilha: '+(res.erro||'desconhecido'));return;}
-      var txt=montarTextoSemanal(res.turnos||[],res.paradas||[]);
-      var pa=document.getElementById('print-area');if(pa){pa.style.fontFamily="'Courier New',monospace";pa.textContent=txt;}
-      window.print();
-    }catch(ex){
-      // fallback local se JSON inválido
-      var txt2=gerarRelatorioSemanal();
-      var pa2=document.getElementById('print-area');if(pa2){pa2.style.fontFamily="'Courier New',monospace";pa2.textContent=txt2;}
-      window.print();
-    }
-  };
-  xhr.onerror=function(){
-    if(btn){btn.textContent='📅 Imprimir Relatório Semanal';btn.disabled=false;}
-    var txt=gerarRelatorioSemanal();
-    var pa=document.getElementById('print-area');if(pa){pa.style.fontFamily="'Courier New',monospace";pa.textContent=txt;}
-    window.print();
-  };
-  xhr.send();
-}
 
 function imprimirRelatorio(){var pa=document.getElementById('print-area');if(pa)pa.textContent=gerarRelatorio();window.print();}
 function copiarRelatorio(){
@@ -1198,23 +1167,6 @@ function copiarRelatorio(){
   else{var ta=document.createElement('textarea');ta.value=txt;ta.style.cssText='position:fixed;opacity:0';document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);flash();}
 }
 
-function toggleGasConfig(){var b=document.getElementById('gasBody'),btn=document.getElementById('gasToggleBtn'),vis=b.style.display!=='none';b.style.display=vis?'none':'block';btn.textContent=vis?'▼ configurar':'▲ fechar';}
-function salvarGasUrl(){try{localStorage.setItem('gas_url_rb0515',document.getElementById('gasUrl').value.trim());}catch(e){}atualizarStatusGas();}
-function atualizarStatusGas(){var url='';try{url=localStorage.getItem('gas_url_rb0515')||'';}catch(e){}var el=document.getElementById('gasStatus');if(!el)return;if(url&&url.indexOf('script.google.com')>-1){el.textContent='✓ URL configurada';el.style.color='var(--green)';}else if(url){el.textContent='⚠ URL parece incorreta';el.style.color='var(--yellow)';}else{el.textContent='— cole a URL do Apps Script acima';el.style.color='var(--textMut)';}}
-function montarPayload(){
-  var C=calcOEE(),mc=calcMeta();var now=new Date();
-  var id='RB0515_'+now.getFullYear()+('0'+(now.getMonth()+1)).slice(-2)+('0'+now.getDate()).slice(-2)+'_'+('0'+now.getHours()).slice(-2)+('0'+now.getMinutes()).slice(-2);
-  return{turno_id:id,maquina:'Torno Star RB0515',operador:CFG.operador,supervisor:CFG.supervisor,numTurno:CFG.numTurno,data:now.toLocaleDateString('pt-BR'),hora_fim:now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),boas:totalBoas(),refugo:totalRefugo(),meta:mc.metaTotal,oee:parseFloat((C.oee*100).toFixed(1)),disp:parseFloat((C.disp*100).toFixed(1)),perf:parseFloat((C.perf*100).toFixed(1)),qual:parseFloat((C.qual*100).toFixed(1)),min_paradas:C.par,blocos:S.blocos,paradas:S.paradas,medicoes:S.medicoes,proc:S.proc,analise:S.analise,obs_proximo:document.getElementById('obsProx')?document.getElementById('obsProx').value:''};
-}
-function enviarPlanilha(){
-  var url='';try{url=localStorage.getItem('gas_url_rb0515')||'';}catch(e){}var btn=document.getElementById('sheet-btn');
-  if(!url||url.indexOf('script.google.com')===-1){document.getElementById('gasBody').style.display='block';document.getElementById('gasToggleBtn').textContent='▲ fechar';btn.textContent='⚠ Configure a URL primeiro';setTimeout(function(){btn.textContent='📊 Enviar para Planilha';},2500);return;}
-  var payload=montarPayload();btn.textContent='⏳ Enviando...';btn.disabled=true;
-  var xhr=new XMLHttpRequest();xhr.open('POST',url,true);xhr.setRequestHeader('Content-Type','text/plain');
-  xhr.onload=function(){btn.textContent='✅ Enviado!';btn.style.background='#166534';setTimeout(function(){btn.textContent='📊 Enviar para Planilha';btn.style.background='';btn.disabled=false;},3000);};
-  xhr.onerror=function(){var fila=[];try{fila=JSON.parse(localStorage.getItem('gas_fila_rb0515')||'[]');}catch(e){}fila.push(payload);try{localStorage.setItem('gas_fila_rb0515',JSON.stringify(fila));}catch(e){}btn.textContent='⚠ Offline — salvo na fila';btn.style.background='#B45309';setTimeout(function(){btn.textContent='📊 Enviar para Planilha';btn.style.background='';btn.disabled=false;},3000);};
-  xhr.send(JSON.stringify(payload));
-}
 
 var _dadosMensais=null;
 
@@ -1226,8 +1178,8 @@ function oeeBg(v){return v>=85?'var(--greenBg)':v>=65?'var(--yellowBg)':'var(--r
 function confirmarNovoTurno(){document.getElementById('modalNovoTurno').classList.add('show');}
 function fecharModal(){document.getElementById('modalNovoTurno').classList.remove('show');}
 function novoTurno(){
-  fecharModal();salvarSnapshotHistorico();
   SB_ID=null; try{localStorage.removeItem('sb_id_star');}catch(e){}
+  fecharModal();salvarSnapshotHistorico();
   S={blocos:[blocoVazio(1)],paradas:[],medicoes:[],medicaoDia:[{ok:null,motivos:[]},{ok:null,motivos:[]},{ok:null,motivos:[]}],proc:{viradaCavaco:false,abastecimento:false,limpezaAutonoma:false,setup:false,obs:''},analise:{problema:'',causaRaiz:'',oQueFoi:'',proposta:'',responsavel:'',acaoPendente:''}};
   if(CFG.conf)CFG.conf.confirmada=false;
   ['pCodigo','pCausa','pAcao','pDuracao','qCota','qNominal','qTol','qValor','qInstrumento','qValorInstr','qObs','procObs','obsProx'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
@@ -1257,7 +1209,8 @@ if(ho)ho.textContent=CFG.operador||'Ana';if(hs)hs.textContent=CFG.supervisor||'A
 if(S.proc.obs){var po=document.getElementById('procObs');if(po)po.value=S.proc.obs;}
 var dtEl=document.getElementById('dataTurno');
 if(dtEl){if(S.dataTurno)dtEl.value=S.dataTurno;else{var td=new Date();dtEl.value=td.getFullYear()+'-'+('0'+(td.getMonth()+1)).slice(-2)+'-'+('0'+td.getDate()).slice(-2);}}
-atualizarStatusGas();atualizarDatalist();
+
+atualizarDatalist();
 
 // Verifica sessão salva — se válida entra direto, senão mostra login
 document.getElementById('header').style.display='none';
@@ -1274,7 +1227,7 @@ sbVerificarToken().then(function(ok){
     mostrarLogin();
     render();
   }
-}).catch(function(){ mostrarLogin(); render(); });
+}).catch(function(){ mostrarLogin(); render(); });render();
 </script>
 </body>
 </html>
